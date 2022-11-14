@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CHAT</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div id="notification" class="notification is-light is-hidden"></div>
+    <div class="container p-4">
+      <header class="hero">
+        <div class="hero-body">
+          <p class="title">Chat P2P</p>
+          <p class="subtitle">Sistemas Distribuidos</p>
+        </div>
+      </header>
+      <!-- Nombre de usuario y conectar -->
+      <div class="columns is-desktop is-gapless mt-2">
+        <div class="column is-half-desktop pr-0 pt-1">
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input
+                class="input"
+                type="text"
+                id="txtUserName"
+                placeholder="Nombre de usuario"
+              />
+            </div>
+            <div class="control">
+              <button id="btnConnect" class="button is-info">Conectar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-desktop mt-2">
+        <!-- Lista de usuarios -->
+        <div class="column is-one-quarter-desktop">
+          <div class="panel">
+            <p class="panel-heading is-size-6">Usuarios conectados</p>
+
+            <div id="usersConnected"></div>
+          </div>
+        </div>
+
+        <!-- Chat y mensajes -->
+        <div class="column">
+          <div class="card">
+            <header class="card-header">
+              <h3 class="card-header-title is-size-5">Mensajes</h3>
+            </header>
+            <div class="card-content">
+              <div class="content pb-4">
+                <div id="messagesContainer"></div>
+              </div>
+            </div>
+            <footer class="card-footer">
+              <fieldset class="column" disabled id="messageForm">
+                <div class="field has-addons">
+                  <p class="control">
+                    <label
+                      class="button is-static"
+                      for="txtMessage"
+                      id="toLabel"
+                      >Para:
+                    </label>
+                  </p>
+                  <p class="control is-expanded">
+                    <input
+                      class="input"
+                      type="text"
+                      id="txtMessage"
+                      placeholder="Mensaje"
+                      title="Subir fichero"
+                    />
+                  </p>
+                  <form class="control">
+                    <button class="button is-info" id="btnUploadFile">
+                      <i class="fas fa-file-upload"></i>
+                      <input
+                        class="file-input"
+                        type="file"
+                        name="uploadFile"
+                        accept="image/x-png,image/gif,image/jpeg"
+                      />
+                    </button>
+                  </form>
+                </div>
+              </fieldset>
+            </footer>
+          </div>
+
+          <div class="columns is-mobile hidden" id="containerProgress">
+            <div class="column">
+              <progress id="upload-progress-bar" max="100" value="0">
+                0
+              </progress>
+              <div class="info-progress" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./frontend.js"></script>
+  </body>
+</html>
