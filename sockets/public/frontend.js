@@ -83,12 +83,22 @@ const reciveMessage = data => {
     unlockChatForm(userOrigen);
   }
 
+  const isText = !message.startsWith("data:image/");
+
   const div = document.createElement('div');
-  const span = document.createElement('span');
-  span.classList.add('has-text-weight-bold', 'mr-1', userOrigen === txtUserName.value ? 'has-text-link' : 'has-text-primary');
-  span.appendChild(document.createTextNode(`${userOrigen}:`));
-  div.appendChild(span);
-  div.innerHTML += message;
+  const spanUser = document.createElement('span');
+  const spanMessage = document.createElement(isText ? 'span' : 'img');
+
+  if (isText) {
+    spanMessage.appendChild(document.createTextNode(message));
+  } else {
+    spanMessage.setAttribute("src", message);
+  }
+
+  spanUser.classList.add('has-text-weight-bold', 'mr-1', userOrigen === txtUserName.value ? 'has-text-link' : 'has-text-primary');
+  spanUser.appendChild(document.createTextNode(`${userOrigen}:`));
+  div.appendChild(spanUser);
+  div.appendChild(spanMessage);
   messagesContainer.appendChild(div);
   messagesContainer.scrollTo(0, messagesContainer.scrollHeight);
 };
@@ -133,7 +143,6 @@ const connectedToMainServer = e => {
     socket.on('recive-message', reciveMessage);
     socket.on('registered-user', displayUsers);
     socket.on('error-registered-user', payload => errorRegisteredUser(payload));
-    socket.on('upload-progress', data => uploadProgress(data));
 
     socket.emit('connected-to-server', { userName: txtUserName.value });
   } else {
@@ -141,57 +150,35 @@ const connectedToMainServer = e => {
   }
 };
 
-/** 
- * @description Mostramos el progreso de la subida
- * @param {object} data Información sobre la subida del archivo
- */
-const uploadProgress = data => {
-  const { recived, total, who } = data;
-  const porcent = Math.floor((recived * 100) / total);
-  const currentlySize = (recived / 1024) / 1024; // MB
-  const totalSize = (total / 1024) / 1024; // MB
-  const progress = document.querySelector('#upload-progress-bar');
-  const infoProgress = document.querySelector('.info-progress');
-  progress.value = Math.floor(porcent);
-  progress.innerHTML = porcent.toFixed(2);
-  infoProgress.innerHTML = `${currentlySize.toFixed(2)} MB ${totalSize.toFixed(2)} MB ${porcent} %`;
-};
 
 /** 
  * @description Cargamos un fichero y se sube al servidor
  * @param {object} evt Evento implicito en la acción ejecutada
  */
 const upload = async evt => {
-  if (txtUserName.value.length >= LENGTH_MIN_USERNAME) {
-    const uploadProgress = document.querySelector('#containerProgress');
-    uploadProgress.classList.remove('hidden');
-    const btnUploadFile = document.querySelector('#btnUploadFile');
-    btnUploadFile.classList.add('is-loading');
-    btnUploadFile.setAttribute('disabled', true);
-    const files = evt.target.files;
-    const data = new FormData();
-    data.append('archivo', files[0]);
-    socket.emit('upload-file', { idUser: txtUserName.dataset.iduser });
-    const result = await (await fetch('/upload-file', {
-      method: 'POST',
-      body: data
-    })).json();
-    btnUploadFile.classList.remove('is-loading');
-    btnUploadFile.removeAttribute('disabled');
-    const { statusCode, path, statusMessage } = result;
-    if (statusCode === 200) {
-      txtMessage.value = `${LITERAL.uploadFile} <a href='${statusMessage}' target='_blank'>[${files[0].name}]</a>`;
-      sendMessage(evt = { key: 'Enter' }, true);
-      notify(LITERAL.uploadSuccess, 'success', 4000);
-    } else {
-      notify(statusMessage, 'danger', 4000);
-    }
-    setTimeout(() => {
-      uploadProgress.classList.add('hidden');
-    }, 2000);
+  const uploadProgress = document.querySelector('#containerProgress');
+  uploadProgress.classList.remove('hidden');
+  const btnUploadFile = document.querySelector('#btnUploadFile');
+  btnUploadFile.classList.add('is-loading');
+  btnUploadFile.setAttribute('disabled', true);
+  const files = evt.target.files;
+  const data = new FormData();
+  data.append('archivo', files[0]);
+
+  const result = await (await fetch('/upload-file', {
+    method: 'POST',
+    body: data
+  })).json();
+
+  btnUploadFile.classList.remove('is-loading');
+  btnUploadFile.removeAttribute('disabled');
+
+  const { statusCode, statusMessage } = result;
+
+  if (statusCode === 200) {
+    notify(LITERAL.uploadSuccess, 'success', 4000);
   } else {
-    document.querySelector('form').reset();
-    notify(LITERAL.minSizeUser, 'danger');
+    notify(statusMessage, 'danger', 4000);
   }
 };
 
