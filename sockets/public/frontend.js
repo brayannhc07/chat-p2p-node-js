@@ -83,7 +83,7 @@ const reciveMessage = data => {
     unlockChatForm(userOrigen);
   }
 
-  const isText = !message.startsWith("data:image/");
+  const isText = !message.startsWith("/upload-file");
 
   const div = document.createElement('div');
   const spanUser = document.createElement('span');
