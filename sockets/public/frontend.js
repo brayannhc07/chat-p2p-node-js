@@ -5,7 +5,7 @@ let btnConnect = null;
 let txtMessage = null;
 let usersPanel = null;
 let notification = null;
-let uploadFile = null;
+let btnUploadFile = null;
 let webrtc = null;
 let toLabel = null;
 let messageForm = null;
@@ -156,6 +156,7 @@ const connectedToMainServer = e => {
  * @param {object} evt Evento implicito en la acción ejecutada
  */
 const upload = async evt => {
+  console.log("Subir imagen - frontend");
   const uploadProgress = document.querySelector('#containerProgress');
   uploadProgress.classList.remove('hidden');
   const btnUploadFile = document.querySelector('#btnUploadFile');
@@ -180,6 +181,8 @@ const upload = async evt => {
   } else {
     notify(statusMessage, 'danger', 4000);
   }
+
+  document.querySelector('form-image').reset();
 };
 
 /** 
@@ -205,8 +208,8 @@ const onLoad = () => {
     }
   });
   btnConnect.addEventListener('click', connectedToMainServer);
-  uploadFile = document.querySelector('input[type=file]');
-  uploadFile.addEventListener('change', upload);
+  btnUploadFile = document.querySelector('input[type=file]');
+  btnUploadFile.addEventListener('change', upload);
 };
 
 /** 
